@@ -21,7 +21,7 @@ namespace EZAppz.Core
             var parts = DescribableObject.ParsePropertyParts(innerIndexer, ',');
             if (parts.Length == 0)
             {
-                var allCounts = this.Where(x => x.ParametersCount == parts.Length);
+                var allCounts = this.Where(x => x.Parameters.Length == parts.Length);
             }
         }
     }
