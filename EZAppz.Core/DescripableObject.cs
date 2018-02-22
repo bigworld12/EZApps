@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace EZAppz.Core
@@ -12,7 +13,7 @@ namespace EZAppz.Core
             this["Item"] = new IndexerDescriptorContainer();
         }
 
-        public DescribableObject RegisterProperty(string prop, object defaultValue = null)
+        public DescribableObject RegisterProperty<TVal>(string prop, TVal defaultValue = default(TVal))
         {
             if (prop == "Item")
             {
@@ -21,10 +22,10 @@ namespace EZAppz.Core
             this[prop] = defaultValue;
             return this;
         }
-        public DescribableObject RegisterIndexer(IndexerDescriptor descriptor, string name = "Item")
+        public DescribableObject RegisterIndexer<TVal>(IndexerDescriptor descriptor)
         {
             IndexerDescriptorContainer idc;
-            if (TryGetValue(name, out var dc))
+            if (TryGetValue("Item", out var dc))
             {
                 if (dc is IndexerDescriptorContainer)
                 {
@@ -37,89 +38,22 @@ namespace EZAppz.Core
             }
             else
             {
-                this[name] = idc = new IndexerDescriptorContainer();
+                this["Item"] = idc = new IndexerDescriptorContainer();
             }
             if (!idc.Contains(descriptor))
                 idc.Add(descriptor);
             return this;
         }
 
-        public static string[] ParsePropertyParts(string prop, char splitDelimiter = '.')
-        {
-            //"a.b[c.d.e.f.g[h]].e"
-            //is parsed to
-            //{"a" , "b[c.d.e.(f.g[h])]" , "e"}
-            prop = prop.Trim(' ', '\'');
-            var final = new List<string>();
-            Stack<char> Brackets = new Stack<char>();
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < prop.Length; i++)
-            {
-                var c = prop[i];
-                switch (c)
-                {
-                    case '[':
-                        {
-                            //openers
-                            Brackets.Push(c);
-                            sb.Append(c);
-                            break;
-                        }
-                    case ']':
-                        {
-                            //closers
-                            var latestDelim = Brackets.Pop();
-                            if (latestDelim != '[')
-                            {
-                                throw new ArgumentException("Path wasn't in the correct format");
-                            }
-                            sb.Append(c);
-                            break;
-                        }
-                    default:
-                        {
-                            if (Brackets.Count == 0)
-                            {
-                                //good
-                                //start checking for '.'
-                                if (c == splitDelimiter)
-                                {
-                                    //split
-                                    final.Add(sb.ToString());
-                                    sb.Clear();
-                                }
-                                else
-                                {
-                                    sb.Append(c);
-                                }
-                            }
-                            else
-                            {
-                                //don't check for dots yet
-                                sb.Append(c);
-                            }
-                            break;
-                        }
-                }
-            }
-            if (sb.Length > 0)
-            {
-                final.Add(sb.ToString());
-                sb.Clear();
-            }
-            return final.ToArray();
-        }
+        
 
-        public object GetPropertyValue(string prop)
+        public virtual object GetPropertyValue(string prop)
         {
-            var paths = ParsePropertyParts(prop);
+            var paths = Helpers.ParsePropertyParts(prop);
             if (paths.Length == 0)
             {
                 return null;
             }
-            //"a.b[c.d.e.(f.g[h])].e.Item[z]"
-            //is parsed to
-            //{"a" , "b[c.d.e.(f.g[h,y]),z]" , "e" , "Item[i]"}
             DescribableObject curObj = this;
             object finalVal = null;
             for (int i = 0; i < paths.Length; i++)
@@ -135,7 +69,7 @@ namespace EZAppz.Core
                 {
                     purePath = "Item";
                 }
-                if (curObj.TryGetValue(purePath, out var val))
+                if (curObj.TryGetValue(purePath, out object val))
                 {
                     if (path.Contains("["))
                     {
@@ -152,16 +86,36 @@ namespace EZAppz.Core
                         {
                             return null;
                         }
-
                         //now we have the indexer container, curObj = result value, or either final value = result value
-                        var pureIndexedParameters = path.Substring(path.IndexOf('['), path.Length - purePath.Length - 1);
-
-
+                        var pureIndexedParameters = path.Substring(path.IndexOf('[') + 1, path.Length - purePath.Length - 2);
+                        var desc = idc.GetDescriptor(pureIndexedParameters, out var vals,out bool suc);
+                        if (!suc)
+                        {
+                            return null;
+                        }
+                        var matchDict = new MethodParameterValue[desc.Value.Parameters.Length];
+                        for (int j = 0; j < desc.Value.Parameters.Length; j++)
+                        {
+                            var param = desc.Value.Parameters[j];
+                            matchDict[j] = new MethodParameterValue(param, vals[j]);                            
+                        }
+                        var IndexerRes = desc.Value.GetValue<DescribableObject,object>(curObj, matchDict);
+                        //check indexer result
+                        if (IndexerRes is DescribableObject d)
+                        {
+                            curObj = d;
+                            finalVal = null;
+                        }
+                        else
+                        {
+                            curObj = null;
+                            finalVal = IndexerRes;
+                        }
                     }
                     else if (val is DescribableObject d)
                     {
                         curObj = d;
-                        finalVal = null;
+                        finalVal = d;
                     }
                     else
                     {
@@ -177,5 +131,21 @@ namespace EZAppz.Core
             }
             return finalVal;
         }
+        public virtual TVal GetPropertyValue<TVal>([CallerMemberName] string prop = null)
+        {
+            if (string.IsNullOrWhiteSpace(prop))
+            {
+                return default(TVal);
+            }
+            var raw = GetPropertyValue(prop);
+            if (raw == null)
+            {
+                return default(TVal);
+            }
+            return (TVal)raw;
+        }
+        
     }
+
+    
 }

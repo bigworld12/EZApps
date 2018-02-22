@@ -4,14 +4,14 @@ using System.Text;
 
 namespace EZAppz.Core
 {
-    public struct IndexerDescriptor
+    public struct IndexerDescriptor : IEquatable<IndexerDescriptor>
     {
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="getter">Function that takes the parameters <list type="number"><item>Source object</item><item>Indexer parameters</item> that returns an object</list></param>
         /// <param name="setter">void that takes the parameters <list type="number"><item>Source object</item><item>Indexer parameters</item><item>new value</item></list></param>
-        public IndexerDescriptor(Func<object, Dictionary<MethodParameter, object>, object> getter, Action<object, Dictionary<MethodParameter, object>, object> setter, params MethodParameter[] Parameters)
+        public IndexerDescriptor(Func<object, MethodParameterValue[], object> getter, Action<object, MethodParameterValue[], object> setter, params MethodParameter[] Parameters)
         {
             if (Parameters.Length == 0)
             {
@@ -23,15 +23,22 @@ namespace EZAppz.Core
         }
         public bool IsReadOnly => Setter == null;
         public MethodParameter[] Parameters { get; }
-        private Func<object, Dictionary<MethodParameter, object>, object> Getter { get; }
-        private Action<object, Dictionary<MethodParameter, object>, object> Setter { get; }
-        public void SetValue(object source, Dictionary<MethodParameter, object> parameters, object newValue)
+        private Func<object, MethodParameterValue[], object> Getter { get; }
+        private Action<object, MethodParameterValue[], object> Setter { get; }
+        public void SetValue<TSource>(DescribableObject source, MethodParameterValue[] parameters, object newValue) where TSource : DescribableObject
         {
-            Setter?.Invoke(source, parameters, newValue);
+            Setter?.Invoke(source as TSource, parameters, newValue);
         }
-        public object GetValue(object source, Dictionary<MethodParameter, object> parameters)
+        public TValue GetValue<TSource,TValue>(DescribableObject source, MethodParameterValue[] parameters) where TSource : DescribableObject
         {
-            return Getter?.Invoke(source, parameters);
+            return (TValue)Getter?.Invoke(source as TSource, parameters);
         }
+
+        public bool Equals(IndexerDescriptor other)
+        {
+            return other.Getter == Getter && other.Setter == Setter;
+        }
+
+      
     }
 }

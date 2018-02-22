@@ -14,4 +14,14 @@ namespace EZAppz.Core
         public Type Type { get; }
         public string Name { get; }
     }
+    public struct MethodParameterValue
+    {
+        public MethodParameterValue(MethodParameter Parameter,object val)
+        {
+            this.Parameter = Parameter;
+            Value = val;
+        }
+        public MethodParameter Parameter { get; }
+        public object Value { get; }
+    }
 }
