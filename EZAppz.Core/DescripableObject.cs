@@ -15,7 +15,7 @@ namespace EZAppz.Core
                 ["Item"] = new IndexerDescriptorContainer()
             };
         }
-        internal Dictionary<string, object> InternalDictionary { get; }
+        protected virtual IDictionary<string, object> InternalDictionary { get; }
         public DescribableObject RegisterProperty<TVal>(string prop, TVal defaultValue = default(TVal))
         {
             if (prop == "Item")
@@ -269,16 +269,15 @@ namespace EZAppz.Core
         /// </summary>
         /// <param name="property"></param>
         /// <param name="value"></param>
-        internal virtual void Before_Set(string property, object value)
+        protected virtual void Before_Set(string property, object value)
         { }
         /// <summary>
         /// gets called directly after setting a value, will be used to implment notifications later
         /// </summary>
         /// <param name="property"></param>
         /// <param name="value"></param>
-        internal virtual void After_Set(string property, object value)
+        protected virtual void After_Set(string property, object value)
         { }
-
     }
 
 
