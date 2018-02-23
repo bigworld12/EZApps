@@ -8,23 +8,23 @@ namespace EZAppz.Core
 {
     public class DescribableObject
     {
-        public DescribableObject() : base()
+        public DescribableObject()
         {
-            InternalDictionary = new Dictionary<string, object>
+            InternalDictionary = new Dictionary<string, DescribableProperty>
             {
-                ["Item"] = new IndexerDescriptorContainer()
+                ["Item"] = new DescribableProperty("Item", true, new IndexerDescriptorContainer())
             };
         }
-        protected virtual IDictionary<string, object> InternalDictionary { get; }
-        public DescribableObject RegisterProperty<TVal>(string prop, TVal defaultValue = default(TVal))
+
+        public DescribableObject RegisterProperty<TVal>(string prop, TVal defaultValue = default(TVal), bool isReadOnly = false)
         {
             if (prop == "Item")
             {
                 throw new ArgumentException("Item property name is reserved for indexer properties, please choose another name");
             }
-            InternalDictionary[prop] = defaultValue;
+            InternalDictionary[prop] = new DescribableProperty(prop, isReadOnly, defaultValue);
             return this;
-        }
+        }        
         /// <summary>
         /// registers an indexer then returns the current type
         /// </summary>
@@ -35,18 +35,19 @@ namespace EZAppz.Core
             IndexerDescriptorContainer idc;
             if (InternalDictionary.TryGetValue("Item", out var dc))
             {
-                if (dc is IndexerDescriptorContainer)
+                if (dc.Value is IndexerDescriptorContainer)
                 {
-                    idc = dc as IndexerDescriptorContainer;
+                    idc = dc.Value as IndexerDescriptorContainer;
                 }
                 else
                 {
-                    idc = new IndexerDescriptorContainer();
+                    //Item must always be the indexer descriptor container
+                    dc.Value = idc = new IndexerDescriptorContainer();
                 }
             }
             else
             {
-                InternalDictionary["Item"] = idc = new IndexerDescriptorContainer();
+                InternalDictionary["Item"] = new DescribableProperty("Item", true, idc = new IndexerDescriptorContainer());
             }
             idc[descriptor.GetHashCode()] = descriptor;
             return this;
@@ -74,18 +75,18 @@ namespace EZAppz.Core
                 {
                     purePath = "Item";
                 }
-                if (curObj.InternalDictionary.TryGetValue(purePath, out object val))
+                if (curObj.InternalDictionary.TryGetValue(purePath, out DescribableProperty dProperty))
                 {
                     if (path.Contains("["))
                     {
                         IndexerDescriptorContainer idc;
-                        if (val is IndexerDescriptorContainer)
+                        if (dProperty.Value is IndexerDescriptorContainer)
                         {
-                            idc = val as IndexerDescriptorContainer;
+                            idc = dProperty.Value as IndexerDescriptorContainer;
                         }
-                        else if (val is DescribableObject dindexer)
+                        else if (dProperty.Value is DescribableObject dindexer)
                         {
-                            idc = dindexer.InternalDictionary["Item"] as IndexerDescriptorContainer;
+                            idc = dindexer.InternalDictionary["Item"].Value as IndexerDescriptorContainer;
                         }
                         else
                         {
@@ -98,13 +99,13 @@ namespace EZAppz.Core
                         {
                             return null;
                         }
-                        var matchDict = new MethodParameterValue[desc.Value.Parameters.Length];
-                        for (int j = 0; j < desc.Value.Parameters.Length; j++)
+                        var matchDict = new MethodParameterValue[desc.Parameters.Length];
+                        for (int j = 0; j < desc.Parameters.Length; j++)
                         {
-                            var param = desc.Value.Parameters[j];
+                            var param = desc.Parameters[j];
                             matchDict[j] = new MethodParameterValue(param, vals[j]);
                         }
-                        var IndexerRes = desc.Value.GetValue<DescribableObject, object>(curObj, matchDict);
+                        var IndexerRes = desc.GetValue<DescribableObject, object>(curObj, matchDict);
                         //check indexer result
                         if (IndexerRes is DescribableObject d)
                         {
@@ -117,7 +118,7 @@ namespace EZAppz.Core
                             finalVal = IndexerRes;
                         }
                     }
-                    else if (val is DescribableObject d)
+                    else if (dProperty.Value is DescribableObject d)
                     {
                         curObj = d;
                         finalVal = d;
@@ -125,7 +126,7 @@ namespace EZAppz.Core
                     else
                     {
                         curObj = null;
-                        finalVal = val;
+                        finalVal = dProperty;
                     }
                 }
                 else
@@ -189,18 +190,19 @@ namespace EZAppz.Core
                 {
                     purePath = "Item";
                 }
-                if (curObj.InternalDictionary.TryGetValue(purePath, out object val))
+                if (curObj.InternalDictionary.TryGetValue(purePath, out DescribableProperty dProperty))
                 {
                     if (path.Contains("["))
                     {
                         IndexerDescriptorContainer idc;
-                        if (val is IndexerDescriptorContainer)
+                        if (dProperty.Value is IndexerDescriptorContainer)
                         {
-                            idc = val as IndexerDescriptorContainer;
+                            idc = dProperty.Value as IndexerDescriptorContainer;
                         }
-                        else if (val is DescribableObject dindexer)
+                        else if (dProperty.Value is DescribableObject dindexer)
                         {
-                            idc = dindexer.InternalDictionary["Item"] as IndexerDescriptorContainer;
+                            idc = dindexer.InternalDictionary["Item"].Value as IndexerDescriptorContainer;
+                            Console.WriteLine("A logically impossible case just happened ! please tell the developers (me) that they suck");
                         }
                         else
                         {
@@ -214,24 +216,28 @@ namespace EZAppz.Core
                         {
                             return;
                         }
-                        var matchDict = new MethodParameterValue[desc.Value.Parameters.Length];
-                        for (int j = 0; j < desc.Value.Parameters.Length; j++)
+                        var matchDict = new MethodParameterValue[desc.Parameters.Length];
+                        for (int j = 0; j < desc.Parameters.Length; j++)
                         {
-                            var param = desc.Value.Parameters[j];
+                            var param = desc.Parameters[j];
                             matchDict[j] = new MethodParameterValue(param, indices[j]);
                         }
                         if (i == lastIndex)
                         {
                             //set indexer here
+                            if (desc.IsReadOnly)
+                            {
+                                return;
+                            }
                             curObj.Before_Set(path, value);
-                            desc.Value.SetValue<DescribableObject>(curObj, matchDict, value);
+                            desc.SetValue<DescribableObject>(curObj, matchDict, value);
                             curObj.After_Set(path, value);
                             return;
                         }
                         else
                         {
                             //get owner object
-                            var IndexerRes = desc.Value.GetValue<DescribableObject, object>(curObj, matchDict);
+                            var IndexerRes = desc.GetValue<DescribableObject, object>(curObj, matchDict);
                             //check indexer result
                             if (IndexerRes is DescribableObject d)
                             {
@@ -243,7 +249,7 @@ namespace EZAppz.Core
                             }
                         }
                     }
-                    else if (val is DescribableObject d)
+                    else if (dProperty.Value is DescribableObject d)
                     {
                         curObj = d;
                     }
@@ -257,26 +263,46 @@ namespace EZAppz.Core
                     return;
                 }
             }
-            curObj.Before_Set(lastPath, value);
-            curObj.InternalDictionary[lastPath] = value;
-            curObj.After_Set(lastPath, value);
+
+            if (curObj.InternalDictionary.TryGetValue(lastPath, out var dp))
+            {
+                if (dp.IsReadOnly)
+                {
+                    return;
+                }
+                curObj.Before_Set(dp.Name, value);
+                dp.Value = value;
+                curObj.After_Set(dp.Name, value);
+            }
+            else
+            {
+                dp = new DescribableProperty(lastPath, false)
+                {
+                    Value = value
+                };
+                //unregistered property
+                curObj.Before_Set(dp.Name, value);
+                curObj.InternalDictionary[lastPath] = dp;
+                curObj.After_Set(dp.Name, value);
+            }
+
         }
 
 
-
+        protected virtual IDictionary<string, DescribableProperty> InternalDictionary { get; }
         /// <summary>
         /// gets called directly before setting a value, will be used to implment notifications later
         /// </summary>
         /// <param name="property"></param>
         /// <param name="value"></param>
-        protected virtual void Before_Set(string property, object value)
+        protected virtual void Before_Set(string property, object NewValue)
         { }
         /// <summary>
         /// gets called directly after setting a value, will be used to implment notifications later
         /// </summary>
         /// <param name="property"></param>
         /// <param name="value"></param>
-        protected virtual void After_Set(string property, object value)
+        protected virtual void After_Set(string property, object NewValue)
         { }
     }
 

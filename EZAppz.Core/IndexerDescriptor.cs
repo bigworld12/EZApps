@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EZAppz.Core
 {
-    public struct IndexerDescriptor : IEquatable<IndexerDescriptor>
+    public class IndexerDescriptor :  IEquatable<IndexerDescriptor>
     {
         /// <summary>
         /// constructor
@@ -29,7 +29,7 @@ namespace EZAppz.Core
         {
             Setter?.Invoke(source as TSource, parameters, newValue);
         }
-        public TValue GetValue<TSource,TValue>(DescribableObject source, MethodParameterValue[] parameters) where TSource : DescribableObject
+        public TValue GetValue<TSource, TValue>(DescribableObject source, MethodParameterValue[] parameters) where TSource : DescribableObject
         {
             return (TValue)Getter?.Invoke(source as TSource, parameters);
         }

@@ -15,8 +15,8 @@ namespace EZAppz.Core.Tester
                 Age = 6,
                 GradeObj = new Grade() { SomeBiskyBoii = 30 }
             };
-            s.SetPropertyValue(20M, "GradeObj.Item[2]");
-            Console.WriteLine(s.GetPropertyValue<decimal>("GradeObj.Item[2]"));
+            s.SetPropertyValue(20M, "GradeObj[2]");
+            Console.WriteLine(s.GetPropertyValue<decimal>("GradeObj[2]"));
             Console.ReadKey();
         }
 
@@ -50,11 +50,7 @@ namespace EZAppz.Core.Tester
                 var para = new MethodParameter[] { new MethodParameter(typeof(int), "index") };
                 RegisterIndexer(new IndexerDescriptor(
                     (x, y) => (x as Grade)[(int)y[0].Value],
-                    (x, y, v) =>
-                    {
-                        var sourceObj = x as Grade;
-                        sourceObj[(int)y[0].Value] = (decimal)v;
-                    }, para));
+                    null, para));
             }
 
 
@@ -68,7 +64,6 @@ namespace EZAppz.Core.Tester
             public decimal this[int index]
             {
                 get { return lastVal[index]; }
-                set { lastVal[index] = value; }
             }
         }
     }

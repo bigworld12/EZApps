@@ -9,7 +9,6 @@ namespace EZAppz.Core
         //a collection represented in a dictionary
         public DescribableList(List<T> initialList = null, bool CloneToNewList = true)
         {
-
             if (initialList != null)
             {
                 if (CloneToNewList)
@@ -33,9 +32,9 @@ namespace EZAppz.Core
                 },
                 new MethodParameter(typeof(int), "index")));
 
-            RegisterProperty(nameof(Count), 0);
-            RegisterProperty(nameof(IsReadOnly), false);
-        }       
+            RegisterProperty(nameof(Count), 0, true);
+            RegisterProperty(nameof(IsReadOnly), false, true);
+        }
         protected List<T> BaseList { get; }
         public virtual T this[int index]
         {

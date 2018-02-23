@@ -13,7 +13,7 @@ namespace EZAppz.Core
         /// </summary>
         /// <param name="innerIndexer"></param>
         /// <returns></returns>
-        public IndexerDescriptor? GetDescriptor(string innerIndexer, out object[] vals, out bool success)
+        public IndexerDescriptor GetDescriptor(string innerIndexer, out object[] vals, out bool success)
         {
             if (string.IsNullOrWhiteSpace(innerIndexer))
             {
