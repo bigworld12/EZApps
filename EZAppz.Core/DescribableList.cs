@@ -5,7 +5,6 @@ namespace EZAppz.Core
 {
     public class DescribableList<T> : DescribableObject, IList<T>
     {
-
         //a collection represented in a dictionary
         public DescribableList(List<T> initialList = null, bool CloneToNewList = true)
         {
