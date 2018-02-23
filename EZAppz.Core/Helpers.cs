@@ -8,10 +8,10 @@ namespace EZAppz.Core
     {
         public static string[] ParsePropertyParts(string prop, char splitDelimiter = '.')
         {
-            //"a.b[c.d.e.f.g[h]].e"
+            //"h.a[5].b[3][9][89].e"
             //is parsed to
-            //{"a" , "b[c.d.e.(f.g[h])]" , "e"}
-            prop = prop.Trim(' ', '\'');
+            //{"h", "a", "Item[5]" , "b","Item[3]" ,"Item[9]", "Item[89]" , "e"}
+            prop = prop.Trim(' ', '\'', '"').Replace(".Item[","[").Replace("[", ".Item[");
             var final = new List<string>();
             Stack<char> Brackets = new Stack<char>();
             StringBuilder sb = new StringBuilder();
@@ -23,7 +23,7 @@ namespace EZAppz.Core
                     case '[':
                         {
                             //openers
-                            Brackets.Push(c);
+                            Brackets.Push(c);                                                       
                             sb.Append(c);
                             break;
                         }
@@ -47,7 +47,8 @@ namespace EZAppz.Core
                                 if (c == splitDelimiter)
                                 {
                                     //split
-                                    final.Add(sb.ToString());
+                                    var st = sb.ToString();
+                                    final.Add(st);
                                     sb.Clear();
                                 }
                                 else
@@ -64,11 +65,12 @@ namespace EZAppz.Core
                         }
                 }
             }
+
             if (sb.Length > 0)
             {
                 final.Add(sb.ToString());
                 sb.Clear();
-            }
+            }            
             return final.ToArray();
         }
     }

@@ -39,6 +39,9 @@ namespace EZAppz.Core
             return other.Getter == Getter && other.Setter == Setter;
         }
 
-      
+        public override int GetHashCode()
+        {
+            return Parameters.GetHashCode();
+        }
     }
 }

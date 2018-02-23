@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using EZAppz.Core;
 
@@ -12,10 +13,10 @@ namespace EZAppz.Core.Tester
             var s = new Student
             {
                 Age = 6,
-                GradeObj = new Grade() { Number = 8 }
+                GradeObj = new Grade() { SomeBiskyBoii = 30 }
             };
-            Console.WriteLine(s.GetPropertyValue("Item[6]"));
-            //Console.WriteLine(s.GetPropertyValue<int>($"{nameof(Student.GradeObj)}.{nameof(Grade.Number)}"));
+            s.SetPropertyValue(20M, "GradeObj.Item[2]");
+            Console.WriteLine(s.GetPropertyValue<decimal>("GradeObj.Item[2]"));
             Console.ReadKey();
         }
 
@@ -25,38 +26,49 @@ namespace EZAppz.Core.Tester
             {
                 RegisterProperty<int>(nameof(Age));
                 RegisterProperty<Grade>(nameof(GradeObj));
-
-                var para = new MethodParameter[] { new MethodParameter(typeof(double), "origin") };
-                RegisterIndexer<double>(new IndexerDescriptor((x, y) => (x as Student)[(double)y[0].Value], null, para));
             }
 
             public virtual int Age
             {
                 get => GetPropertyValue<int>();
-                set => this[nameof(Age)] = value;
+                set => SetPropertyValue(value);
             }
 
             public virtual Grade GradeObj
             {
                 get => GetPropertyValue<Grade>();
-                set => this[nameof(GradeObj)] = value;
+                set => SetPropertyValue(value);
             }
 
-            public double this[double origin]
-            {
-                get
-                {
-                    return origin * 2;
-                }
-            }
+
         }
 
         public class Grade : DescribableObject
         {
-            public virtual int Number
+            public Grade()
             {
-                get => GetPropertyValue<int>();
-                set => this[nameof(Number)] = value;
+                var para = new MethodParameter[] { new MethodParameter(typeof(int), "index") };
+                RegisterIndexer(new IndexerDescriptor(
+                    (x, y) => (x as Grade)[(int)y[0].Value],
+                    (x, y, v) =>
+                    {
+                        var sourceObj = x as Grade;
+                        sourceObj[(int)y[0].Value] = (decimal)v;
+                    }, para));
+            }
+
+
+            public decimal SomeBiskyBoii
+            {
+                get => GetPropertyValue<decimal>();
+                set => SetPropertyValue(value);
+            }
+
+            private decimal[] lastVal = new decimal[10];
+            public decimal this[int index]
+            {
+                get { return lastVal[index]; }
+                set { lastVal[index] = value; }
             }
         }
     }

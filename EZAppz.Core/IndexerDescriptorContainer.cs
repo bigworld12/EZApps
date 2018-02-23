@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace EZAppz.Core
 {
-    public class IndexerDescriptorContainer : HashSet<IndexerDescriptor>
+    public class IndexerDescriptorContainer : Dictionary<int,IndexerDescriptor>
     {
         /// <summary>
         /// gets the suitable descriptor based on the parameters
@@ -27,7 +27,7 @@ namespace EZAppz.Core
             {
                 foreach (var ind in this)
                 {
-                    if (ind.Parameters.Length != parts.Length)
+                    if (ind.Value.Parameters.Length != parts.Length)
                     {
                         continue;
                     }
@@ -35,7 +35,7 @@ namespace EZAppz.Core
                     for (int i = 0; i < parts.Length; i++)
                     {
                         var part = parts[i];
-                        var indParam = ind.Parameters[i];
+                        var indParam = ind.Value.Parameters[i];
 
                         if (CanBeOfType(part, indParam.Type, out var val))
                         {
@@ -50,7 +50,7 @@ namespace EZAppz.Core
                     if (isGood)
                     {
                         success = true;
-                        return ind;
+                        return ind.Value;
                     }
                 }
             }
