@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -8,16 +9,63 @@ namespace EZAppz.Core
 {
     public class DescribableObject
     {
-        public DescribableObject()
+        public DescribableObject(bool ImportFromReflection = false)
         {
-            InternalDictionary = new Dictionary<string, DescribableProperty>
+            if (ImportFromReflection)
             {
-                ["Item"] = new DescribableProperty("Item", true, new IndexerDescriptorContainer())
-            };
+                ImportDescriptionFromReflection(true, false);
+            }
+            else
+                InternalDictionary = new Dictionary<string, DescribableProperty>
+                {
+                    ["Item"] = new DescribableProperty("Item", true, new IndexerDescriptorContainer())
+                };
         }
-        public void ImportDescriptionFromReflection(bool RemovePrevious = true)
+        public void ImportDescriptionFromReflection(bool RemovePrevious, bool ImportIndexersOnly)
         {
+            if (RemovePrevious)
+            {
+                InternalDictionary = new Dictionary<string, DescribableProperty>
+                {
+                    ["Item"] = new DescribableProperty("Item", true, new IndexerDescriptorContainer())
+                };
+            }
+            var t = GetType();
+            var props = t.GetProperties();
+            foreach (var prop in props)
+            {
+                var indexed = prop.GetIndexParameters();
+                if (indexed.Length > 0)
+                {
+                    //register indexer                    
+                    var mparams = new MethodParameter[indexed.Length];
+                    for (int i = 0; i < indexed.Length; i++)
+                    {
+                        var item = indexed[i];
+                        mparams[i] = new MethodParameter(item.ParameterType, item.Name);
+                    }
 
+                    Action<MethodParameterValue[], object> setter = null;
+                    if (prop.CanWrite)
+                    {
+                        setter = (para, val) =>
+                        {
+                            prop.SetValue(this, val, para.Select(x => x.Value).ToArray());
+                        };
+                    }
+                    var desc = new IndexerDescriptor(
+                        (para) =>
+                        {
+                            return prop.GetValue(this, para.Select(x => x.Value).ToArray());
+                        },
+                        setter, mparams.ToArray());
+                    RegisterIndexer(desc);
+                }
+                else if (!ImportIndexersOnly)
+                {
+                    InternalDictionary[prop.Name] = new DescribableProperty(prop.Name, !prop.CanWrite, prop.PropertyType.IsValueType ? Activator.CreateInstance(prop.PropertyType) : null);
+                }
+            }
         }
         public DescribableObject RegisterProperty<TVal>(string prop, TVal defaultValue = default(TVal), bool isReadOnly = false)
         {
@@ -27,7 +75,7 @@ namespace EZAppz.Core
             }
             InternalDictionary[prop] = new DescribableProperty(prop, isReadOnly, defaultValue);
             return this;
-        }        
+        }
         /// <summary>
         /// registers an indexer then returns the current type
         /// </summary>
@@ -292,7 +340,8 @@ namespace EZAppz.Core
 
         }
 
-        protected virtual IDictionary<string, DescribableProperty> InternalDictionary { get; }
+        private IDictionary<string, DescribableProperty> InternalDictionary;
+
         /// <summary>
         /// gets called directly before setting a value, will be used to implment notifications later
         /// </summary>

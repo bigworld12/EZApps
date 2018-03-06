@@ -26,9 +26,20 @@ namespace EZAppz.Core
         private List<T> Items = new List<T>();
         public T this[int index]
         {
-            get => Items[index];
+            get
+            {
+                if (index < 0 || index >= Count)
+                {
+                    return default(T);
+                }
+                return Items[index];
+            }
             set
             {
+                if (index < 0 || index >= Count)
+                {
+                    return;
+                }
                 var old = Items[index];
                 if (EqualityComparer<T>.Default.Equals(old, value))
                 {
@@ -75,6 +86,7 @@ namespace EZAppz.Core
             {
                 PrepareIncomingItem(item);
             }
+            RaisePropertyChanging($"Item[{Count}]");
             Items.Add(item);
             RaisePropertyChanged($"Item[{Count - 1}]");
             RaisePropertyChanged(nameof(Count));
