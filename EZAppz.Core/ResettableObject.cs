@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EZAppz.Core
 {
-    public class ResettableObject : NotifiableObject
+    public class ResettableObject : NotifyBase
     {
 
     }

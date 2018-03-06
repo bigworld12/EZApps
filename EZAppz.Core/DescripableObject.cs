@@ -15,7 +15,10 @@ namespace EZAppz.Core
                 ["Item"] = new DescribableProperty("Item", true, new IndexerDescriptorContainer())
             };
         }
+        public void ImportDescriptionFromReflection(bool RemovePrevious = true)
+        {
 
+        }
         public DescribableObject RegisterProperty<TVal>(string prop, TVal defaultValue = default(TVal), bool isReadOnly = false)
         {
             if (prop == "Item")
@@ -105,7 +108,7 @@ namespace EZAppz.Core
                             var param = desc.Parameters[j];
                             matchDict[j] = new MethodParameterValue(param, vals[j]);
                         }
-                        var IndexerRes = desc.GetValue<DescribableObject, object>(curObj, matchDict);
+                        var IndexerRes = desc.GetValue<object>(matchDict);
                         //check indexer result
                         if (IndexerRes is DescribableObject d)
                         {
@@ -150,6 +153,7 @@ namespace EZAppz.Core
             }
             return (TVal)raw;
         }
+
         public virtual void SetPropertyValue<TVal>(TVal value, [CallerMemberName] string prop = null)
         {
             var paths = Helpers.ParsePropertyParts(prop);
@@ -230,14 +234,14 @@ namespace EZAppz.Core
                                 return;
                             }
                             curObj.Before_Set(path, value);
-                            desc.SetValue<DescribableObject>(curObj, matchDict, value);
+                            desc.SetValue(matchDict, value);
                             curObj.After_Set(path, value);
                             return;
                         }
                         else
                         {
                             //get owner object
-                            var IndexerRes = desc.GetValue<DescribableObject, object>(curObj, matchDict);
+                            var IndexerRes = desc.GetValue<object>(matchDict);
                             //check indexer result
                             if (IndexerRes is DescribableObject d)
                             {
@@ -287,7 +291,6 @@ namespace EZAppz.Core
             }
 
         }
-
 
         protected virtual IDictionary<string, DescribableProperty> InternalDictionary { get; }
         /// <summary>

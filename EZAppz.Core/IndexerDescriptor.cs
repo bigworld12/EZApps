@@ -11,27 +11,27 @@ namespace EZAppz.Core
         /// </summary>
         /// <param name="getter">Function that takes the parameters <list type="number"><item>Source object</item><item>Indexer parameters</item> that returns an object</list></param>
         /// <param name="setter">void that takes the parameters <list type="number"><item>Source object</item><item>Indexer parameters</item><item>new value</item></list></param>
-        public IndexerDescriptor(Func<object, MethodParameterValue[], object> getter, Action<object, MethodParameterValue[], object> setter, params MethodParameter[] Parameters)
+        public IndexerDescriptor(Func<MethodParameterValue[], object> getter, Action<MethodParameterValue[], object> setter, params MethodParameter[] Parameters)
         {
             if (Parameters.Length == 0)
             {
                 throw new ArgumentException("indexers must have at least 1 parameter");
-            }
+            }            
             this.Parameters = Parameters;
             Getter = getter;
             Setter = setter;
         }
         public bool IsReadOnly => Setter == null;
         public MethodParameter[] Parameters { get; }
-        private Func<object, MethodParameterValue[], object> Getter { get; }
-        private Action<object, MethodParameterValue[], object> Setter { get; }
-        public void SetValue<TSource>(DescribableObject source, MethodParameterValue[] parameters, object newValue) where TSource : DescribableObject
+        private Func<MethodParameterValue[], object> Getter { get; }
+        private Action<MethodParameterValue[], object> Setter { get; }
+        public void SetValue(MethodParameterValue[] parameters, object newValue)
         {
-            Setter?.Invoke(source as TSource, parameters, newValue);
+            Setter?.Invoke(parameters, newValue);
         }
-        public TValue GetValue<TSource, TValue>(DescribableObject source, MethodParameterValue[] parameters) where TSource : DescribableObject
+        public TValue GetValue<TValue>(MethodParameterValue[] parameters)
         {
-            return (TValue)Getter?.Invoke(source as TSource, parameters);
+            return (TValue)Getter?.Invoke(parameters);
         }
 
         public bool Equals(IndexerDescriptor other)

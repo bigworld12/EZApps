@@ -21,13 +21,13 @@ namespace EZAppz.Core
             }
 
             RegisterIndexer(new IndexerDescriptor(
-                (source, param) =>
+                (param) =>
                 {
-                    return (source as DescribableList<T>)[(int)param[0].Value];
+                    return this[(int)param[0].Value];
                 },
-                (source, param, value) =>
+                (param, value) =>
                 {
-                    (source as DescribableList<T>)[(int)param[0].Value] = (T)value;
+                    this[(int)param[0].Value] = (T)value;
                 },
                 new MethodParameter(typeof(int), "index")));
 
