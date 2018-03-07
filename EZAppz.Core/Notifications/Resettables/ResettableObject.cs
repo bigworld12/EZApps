@@ -14,6 +14,10 @@ namespace EZAppz.Core
         }
         private void ResettableObject_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
         {
+            if (OldValues.ContainsKey(e.PropertyName))
+            {
+                return;
+            }
             //store old value in OldValues
             OldValues[e.PropertyName] = GetPropertyValue(e.PropertyName);
         }
@@ -27,14 +31,14 @@ namespace EZAppz.Core
             //if value was a notifiable object, listen to it and bubble its events to current object
             var oldValue = GetPropertyValue(property);
 
-            if (oldValue is ResettableObject nbOld)
+            if (oldValue is IResettable nbOld)
             {
                 var (changing, changed) = PropertyListenerDelegateLocation[property];
                 nbOld.PropertyChanging -= changing;
                 nbOld.PropertyChanged -= changed;
             }
 
-            if (NewValue is NotifyBase nbNew)
+            if (NewValue is IResettable nbNew)
             {
                 (PropertyChangingEventHandler changing, PropertyChangedEventHandler changed) propPair = ((s, e) =>
                 {
@@ -43,8 +47,7 @@ namespace EZAppz.Core
                 , (s, e) =>
                 {
                     RaisePropertyChanged(property + "." + e.PropertyName);
-                }
-                );
+                });
 
                 PropertyListenerDelegateLocation[property] = propPair;
                 nbNew.PropertyChanging += propPair.changing;
@@ -71,7 +74,7 @@ namespace EZAppz.Core
         public void Reset()
         {
             foreach (var item in OldValues)
-            {
+            {                
                 SetPropertyValue(item.Value, item.Key);
             }
             OldValues.Clear();

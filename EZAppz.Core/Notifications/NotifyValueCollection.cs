@@ -6,9 +6,9 @@ using System.Text;
 
 namespace EZAppz.Core
 {
-    public class NotifyValueCollectionBase<T> : NotifyBase, IList<T>, INotifyCollectionChanged
+    public class NotifyValueCollection<T> : NotifyBase, IList<T>, INotifyCollectionChanged
     {
-        public NotifyValueCollectionBase(bool ImportFromReflection = false) : base(ImportFromReflection)
+        public NotifyValueCollection(bool ImportFromReflection = false) : base(ImportFromReflection)
         {
             RegisterIndexer(new IndexerDescriptor(
                 (param) =>
@@ -105,14 +105,22 @@ namespace EZAppz.Core
         }
         public void Insert(int index, T item)
         {
+            //make sure index is always within bounds
+            if (index > Items.Count)
+            {
+                for (int i = 0; i < index - Items.Count; i++)
+                {
+                    Add(default(T));
+                }
+            }
             RaisePropertyChanging(nameof(Count));
             if (IsDoPrepare)
                 PrepareIncomingItem(item);
-            for (int i = index; i < Count; i++)
+            for (int i = index; i <= Count; i++)
             {
                 RaisePropertyChanging($"Item[{i}]");
             }
-            Items.Add(item);
+            Items.Insert(index, item);
             for (int i = index; i < Count; i++)
             {
                 RaisePropertyChanged($"Item[{i}]");
@@ -145,7 +153,7 @@ namespace EZAppz.Core
                 RaisePropertyChanging($"Item[{i}]");
             }
             Items.RemoveAt(index);
-            for (int i = index; i < Count + 1; i++)
+            for (int i = index; i <= Count; i++)
             {
                 RaisePropertyChanged($"Item[{i}]");
             }

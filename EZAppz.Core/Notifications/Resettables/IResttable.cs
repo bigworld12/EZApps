@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EZAppz.Core
 {
-    public interface IResettable
+    public interface IResettable:INotifyBase
     {
         /// <summary>
         /// Saves the current changes in the object as the current state

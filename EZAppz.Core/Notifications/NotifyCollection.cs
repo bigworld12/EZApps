@@ -7,12 +7,12 @@ using System.Text;
 
 namespace EZAppz.Core
 {
-    public delegate void ItemPropertyChangingEventHandler<T>(NotifyCollectionBase<T> SourceList, T Item, PropertyChangingEventArgs e) where T : INotifyBase;
-    public delegate void ItemPropertyChangedEventHandler<T>(NotifyCollectionBase<T> SourceList, T Item, PropertyChangedEventArgs e) where T : INotifyBase;
-    public class NotifyCollectionBase<T> : NotifyValueCollectionBase<T>, IList<T>, INotifyCollectionChanged
+    public delegate void ItemPropertyChangingEventHandler<T>(NotifyCollection<T> SourceList, T Item, PropertyChangingEventArgs e) where T : INotifyBase;
+    public delegate void ItemPropertyChangedEventHandler<T>(NotifyCollection<T> SourceList, T Item, PropertyChangedEventArgs e) where T : INotifyBase;
+    public class NotifyCollection<T> : NotifyValueCollection<T>, IList<T>, INotifyCollectionChanged
         where T : INotifyBase
     {
-        public NotifyCollectionBase(bool ImportFromReflection = false) : base(ImportFromReflection)
+        public NotifyCollection(bool ImportFromReflection = false) : base(ImportFromReflection)
         {
 
         }
