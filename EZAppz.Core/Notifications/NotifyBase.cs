@@ -10,6 +10,7 @@ namespace EZAppz.Core
     [Serializable]
     public abstract class NotifyBase : DescribableObject, INotifyBase
     {
+        
         protected class PropertyRelation
         {
             public HashSet<NotifyDescriptor> RelatedProps { get; } = new HashSet<NotifyDescriptor>();
@@ -17,7 +18,7 @@ namespace EZAppz.Core
             public HashSet<Action> RelatedChangingActions { get; } = new HashSet<Action>();
         }
         private Dictionary<string, PropertyRelation> PropertyRelations { get; } = new Dictionary<string, PropertyRelation>();
-        public NotifyBase()
+        public NotifyBase(bool ImportFromReflection = false) : base(ImportFromReflection)
         {
             PropertyChanged += NotifyBase_PropertyChanged;
             PropertyChanging += NotifyBase_PropertyChanging;
@@ -137,28 +138,6 @@ namespace EZAppz.Core
             PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(prop));
         }
 
-        protected Delegate[] GetChangingListenerDelegates()
-        {
-            if (PropertyChanging == null)
-            {
-                return new Delegate[0];
-            }
-            else
-            {
-                return PropertyChanging.GetInvocationList();
-            }
-        }
-        protected Delegate[] GetChangedListenerDelegates()
-        {
-            if (PropertyChanged == null)
-            {
-                return new Delegate[0];
-            }
-            else
-            {
-                return PropertyChanged.GetInvocationList();
-            }
-        }
 
         [field: NonSerialized]
         public event PropertyChangingEventHandler PropertyChanging;

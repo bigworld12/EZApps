@@ -11,7 +11,11 @@ namespace EZAppz.Core
     public delegate void ItemPropertyChangedEventHandler<T>(NotifyCollectionBase<T> SourceList, T Item, PropertyChangedEventArgs e) where T : INotifyBase;
     public class NotifyCollectionBase<T> : NotifyValueCollectionBase<T>, IList<T>, INotifyCollectionChanged
         where T : INotifyBase
-    {       
+    {
+        public NotifyCollectionBase(bool ImportFromReflection = false) : base(ImportFromReflection)
+        {
+
+        }
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             RaiseItemPropertyChanged((T)sender, e);

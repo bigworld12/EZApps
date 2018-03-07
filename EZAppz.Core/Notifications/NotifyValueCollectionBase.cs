@@ -8,7 +8,7 @@ namespace EZAppz.Core
 {
     public class NotifyValueCollectionBase<T> : NotifyBase, IList<T>, INotifyCollectionChanged
     {
-        public NotifyValueCollectionBase()
+        public NotifyValueCollectionBase(bool ImportFromReflection = false) : base(ImportFromReflection)
         {
             RegisterIndexer(new IndexerDescriptor(
                 (param) =>

@@ -1,13 +1,14 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 
 namespace EZAppz.Core
 {
-    public class ResettableObject : NotifyBase
+    public class ResettableObject : NotifyBase, IResettable
     {
-        public ResettableObject()
+        public ResettableObject(bool ImportFromReflection = false) : base(ImportFromReflection)
         {
             PropertyChanging += ResettableObject_PropertyChanging;
         }
@@ -18,9 +19,7 @@ namespace EZAppz.Core
         }
 
 
-        /// <summary>
-        /// first index 
-        /// </summary>
+        
         Dictionary<string, (PropertyChangingEventHandler changing, PropertyChangedEventHandler changed)> PropertyListenerDelegateLocation = new Dictionary<string, (PropertyChangingEventHandler changing, PropertyChangedEventHandler changed)>();
 
         protected override void Before_Set(string property, object NewValue)
@@ -28,7 +27,7 @@ namespace EZAppz.Core
             //if value was a notifiable object, listen to it and bubble its events to current object
             var oldValue = GetPropertyValue(property);
 
-            if (oldValue is NotifyBase nbOld)
+            if (oldValue is ResettableObject nbOld)
             {
                 var (changing, changed) = PropertyListenerDelegateLocation[property];
                 nbOld.PropertyChanging -= changing;
@@ -44,7 +43,8 @@ namespace EZAppz.Core
                 , (s, e) =>
                 {
                     RaisePropertyChanged(property + "." + e.PropertyName);
-                });
+                }
+                );
 
                 PropertyListenerDelegateLocation[property] = propPair;
                 nbNew.PropertyChanging += propPair.changing;
