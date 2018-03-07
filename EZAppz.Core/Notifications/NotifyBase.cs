@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -134,6 +135,29 @@ namespace EZAppz.Core
         public void RaisePropertyChanging([CallerMemberName] string prop = null)
         {
             PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(prop));
+        }
+
+        protected Delegate[] GetChangingListenerDelegates()
+        {
+            if (PropertyChanging == null)
+            {
+                return new Delegate[0];
+            }
+            else
+            {
+                return PropertyChanging.GetInvocationList();
+            }
+        }
+        protected Delegate[] GetChangedListenerDelegates()
+        {
+            if (PropertyChanged == null)
+            {
+                return new Delegate[0];
+            }
+            else
+            {
+                return PropertyChanged.GetInvocationList();
+            }
         }
 
         [field: NonSerialized]
