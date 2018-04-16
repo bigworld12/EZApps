@@ -177,7 +177,7 @@ namespace EZAppz.Core
                     else
                     {
                         curObj = null;
-                        finalVal = dProperty;
+                        finalVal = dProperty.Value;
                     }
                 }
                 else

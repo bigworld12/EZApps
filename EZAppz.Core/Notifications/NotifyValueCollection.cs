@@ -50,7 +50,9 @@ namespace EZAppz.Core
                     PrepareLeavingItem(old);
                     PrepareIncomingItem(value);
                 }
+                RaisePropertyChanging($"Item[{index}]");
                 Items[index] = value;
+                RaisePropertyChanged($"Item[{index}]");
                 RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, old, index));
             }
         }

@@ -12,7 +12,7 @@ namespace EZAppz.Core
     public class NotifyCollection<T> : NotifyValueCollection<T>, IList<T>, INotifyCollectionChanged
         where T : INotifyBase
     {
-        public NotifyCollection(bool ImportFromReflection = false) : base(ImportFromReflection)
+        public NotifyCollection() : base(false)
         {
 
         }
@@ -27,7 +27,6 @@ namespace EZAppz.Core
 
         protected override void PrepareIncomingItem(T item)
         {
-            PrepareLeavingItem(item);
             item.PropertyChanged += Item_PropertyChanged;
             item.PropertyChanging += Item_PropertyChanging;
         }
@@ -47,7 +46,7 @@ namespace EZAppz.Core
 
         public void RaiseItemPropertyChanged(T item, PropertyChangedEventArgs args)
         {
-            ItemPropertyChanged?.Invoke(this, item, args);
+            ItemPropertyChanged?.Invoke(this, item, args);            
         }
         public event ItemPropertyChangedEventHandler<T> ItemPropertyChanged;
     }
