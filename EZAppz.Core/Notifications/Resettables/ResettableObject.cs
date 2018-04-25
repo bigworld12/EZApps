@@ -20,7 +20,8 @@ namespace EZAppz.Core
             }
             //store old value in OldValues
             OldValues[e.PropertyName] = GetPropertyValue(e.PropertyName);
-        }
+        }        
+
         Dictionary<string, object> OldValues { get; } = new Dictionary<string, object>();
         public HashSet<IResettable> ResetExeclusions { get; } = new HashSet<IResettable>();
         public HashSet<string> PropertyResetExeclusions { get; } = new HashSet<string>();

@@ -11,13 +11,14 @@ namespace EZAppz.Core
             //"h.a[5].b[3][9][89].e"
             //is parsed to
             //{"h", "a", "Item[5]" , "b","Item[3]" ,"Item[9]", "Item[89]" , "e"}
-            var clean = prop.Trim(' ', '\'', '"');
+
+            var final = new List<string>();
+            var clean = prop.Trim(' ', '\'', '"');            
             if (clean.StartsWith("Item["))
             {
-                clean = clean.Remove(0, 4);
+                clean.Remove(0, 4);
             }
-            prop = clean.Replace(".Item[", "[").Replace("[", ".Item[");
-            var final = new List<string>();
+            prop = clean.Replace(".Item[", "[").Replace("[", ".Item[").Trim('.');
             Stack<char> Brackets = new Stack<char>();
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < prop.Length; i++)
@@ -76,7 +77,7 @@ namespace EZAppz.Core
                 final.Add(sb.ToString());
                 sb.Clear();
             }
-            final.RemoveAll(x => string.IsNullOrWhiteSpace(x));
+            //final.RemoveAll(x => string.IsNullOrWhiteSpace(x));
             return final.ToArray();
         }
     }

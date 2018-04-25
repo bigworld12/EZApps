@@ -19,6 +19,14 @@ namespace EZAppz.Core
             }
             OldValues[e.PropertyName] = GetPropertyValue(e.PropertyName);
         }
+        protected override bool PrepareIncomingItem(T item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+            return base.PrepareIncomingItem(item);
+        }
         Dictionary<string, object> OldValues = new Dictionary<string, object>();
         public HashSet<IResettable> ResetExeclusions { get; } = new HashSet<IResettable>();
         public HashSet<string> PropertyResetExeclusions { get; } = new HashSet<string>();

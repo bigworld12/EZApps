@@ -17,7 +17,15 @@ namespace EZAppz.Core
             {
                 return;
             }            
-            OldValues[e.PropertyName] = GetPropertyValue(e.PropertyName); ;
+            OldValues[e.PropertyName] = GetPropertyValue(e.PropertyName);
+        }
+        protected override bool PrepareIncomingItem(T item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+            return base.PrepareIncomingItem(item);
         }
         Dictionary<string, object> OldValues { get; } = new Dictionary<string, object>();
 

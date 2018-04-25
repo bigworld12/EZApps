@@ -183,9 +183,7 @@ namespace EZAppz.Core
         protected virtual bool IsDoPrepare => false;
 
         protected virtual bool PrepareIncomingItem(T item)
-        {
-            return item != null;
-        }
+        { return true; }
         protected virtual void PrepareLeavingItem(T item)
         { }
     }

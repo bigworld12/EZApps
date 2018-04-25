@@ -26,11 +26,7 @@ namespace EZAppz.Core
         }
 
         protected override bool PrepareIncomingItem(T item)
-        {
-            if (item == null)
-            {
-                return false;
-            }
+        {            
             item.PropertyChanged += Item_PropertyChanged;
             item.PropertyChanging += Item_PropertyChanging;
             return true;
