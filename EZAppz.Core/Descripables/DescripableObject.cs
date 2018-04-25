@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace EZAppz.Core
@@ -103,6 +104,57 @@ namespace EZAppz.Core
             idc[descriptor.GetHashCode()] = descriptor;
             return this;
         }
+
+        /// <summary>
+        /// Only call this for quickly registering the properties of the class, instead of calling RegisterProperty in the constructor each time
+        /// </summary>
+        /// <typeparam name="TVal">the type of the new value</typeparam>
+        /// <param name="value">the new value</param>
+        /// <param name="prop">the property name (gets auto filled)</param>
+        /// <param name="isReadOnly">if the property is read only or not</param>
+        /// <param name="defaultValue"></param>
+        public void RegisterAndSet<TVal>(TVal value, [CallerMemberName] string prop = null, bool isReadOnly = false, TVal defaultValue = default(TVal))
+        {
+            if (prop == "Item")
+            {
+                throw new ArgumentException("Item property name is reserved for indexer properties, please choose another name");
+            }
+            if (InternalDictionary.TryGetValue(prop, out var p))
+            {
+                Before_Set(prop, value);
+                p.Value = value;
+                After_Set(prop, value);
+            }
+            else
+            {
+                p = new DescribableProperty(prop, isReadOnly, defaultValue);
+                InternalDictionary[prop] = p;
+                Before_Set(prop, value);
+                p.Value = value;
+                After_Set(prop, value);
+            }
+        }
+        /// <summary>
+        /// Only call this for quickly registering the properties of the class, instead of calling RegisterProperty in the constructor each time
+        /// </summary>
+        /// <typeparam name="TVal">the type of the value to get</typeparam>
+        /// <param name="prop">the property name (gets auto filled)</param>
+        /// <param name="isReadOnly">if the property is read only or not</param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public TVal RegisterAndGet<TVal>([CallerMemberName] string prop = null, bool isReadOnly = false, TVal defaultValue = default(TVal))
+        {
+            if (InternalDictionary.TryGetValue(prop, out var p))
+            {
+                return (TVal)p.Value;
+            }
+            else
+            {
+                InternalDictionary[prop] = new DescribableProperty(prop, isReadOnly, defaultValue);
+                return defaultValue;
+            }
+        }
+
 
         public virtual object GetPropertyValue([CallerMemberName] string prop = null)
         {
@@ -316,6 +368,9 @@ namespace EZAppz.Core
                 }
             }
 
+            if (curObj == null)
+                return;
+
             if (curObj.InternalDictionary.TryGetValue(lastPath, out var dp))
             {
                 if (dp.IsReadOnly)
@@ -340,7 +395,7 @@ namespace EZAppz.Core
 
         }
 
-        private IDictionary<string, DescribableProperty> InternalDictionary;
+        internal protected IDictionary<string, DescribableProperty> InternalDictionary;
 
         /// <summary>
         /// gets called directly before setting a value, will be used to implment notifications later
@@ -355,7 +410,7 @@ namespace EZAppz.Core
         /// <param name="property"></param>
         /// <param name="value"></param>
         protected virtual void After_Set(string property, object NewValue)
-        { }
+        { }       
     }
 
 

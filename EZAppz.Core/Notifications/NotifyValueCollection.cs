@@ -23,7 +23,7 @@ namespace EZAppz.Core
             RegisterProperty(nameof(Count), 0, true);
             RegisterProperty(nameof(IsReadOnly), false, true);
         }
-        private List<T> Items = new List<T>();
+        internal protected List<T> Items = new List<T>();
         public T this[int index]
         {
             get
@@ -47,8 +47,13 @@ namespace EZAppz.Core
                 }
                 if (IsDoPrepare)
                 {
+                    if (!PrepareIncomingItem(value))
+                    {
+                        //remove
+                        RemoveAt(index);
+                        return;
+                    }
                     PrepareLeavingItem(old);
-                    PrepareIncomingItem(value);
                 }
                 RaisePropertyChanging($"Item[{index}]");
                 Items[index] = value;
@@ -86,7 +91,10 @@ namespace EZAppz.Core
             RaisePropertyChanging(nameof(Count));
             if (IsDoPrepare)
             {
-                PrepareIncomingItem(item);
+                if (!PrepareIncomingItem(item))
+                {
+                    return;
+                }
             }
             RaisePropertyChanging($"Item[{Count}]");
             Items.Add(item);
@@ -117,7 +125,7 @@ namespace EZAppz.Core
             }
             RaisePropertyChanging(nameof(Count));
             if (IsDoPrepare)
-                PrepareIncomingItem(item);
+                if (!PrepareIncomingItem(item)) return;
             for (int i = index; i <= Count; i++)
             {
                 RaisePropertyChanging($"Item[{i}]");
@@ -174,8 +182,10 @@ namespace EZAppz.Core
         /// </summary>
         protected virtual bool IsDoPrepare => false;
 
-        protected virtual void PrepareIncomingItem(T item)
-        { }
+        protected virtual bool PrepareIncomingItem(T item)
+        {
+            return item != null;
+        }
         protected virtual void PrepareLeavingItem(T item)
         { }
     }

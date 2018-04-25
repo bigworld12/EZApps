@@ -7,7 +7,7 @@ using System.Text;
 
 namespace EZAppz.Core
 {
-    [Serializable]
+
     public abstract class NotifyBase : DescribableObject, INotifyBase
     {
         

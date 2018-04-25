@@ -1,27 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace EZAppz.Core
 {
-    public class ResettableValueCollection<T> : NotifyValueCollection<T>, IResettable
+   
+    public class ResettableCollection<T> : NotifyCollection<T>, IResettable where T : INotifyBase
     {
-        public ResettableValueCollection()
+        public ResettableCollection()
         {
             PropertyChanging += ResettableValueCollection_PropertyChanging;
-        }
+        }       
         private void ResettableValueCollection_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
         {
             if (OldValues.ContainsKey(e.PropertyName) || PropertyResetExeclusions.Contains(e.PropertyName))
             {
                 return;
-            }
-            OldValues[e.PropertyName] = GetPropertyValue(e.PropertyName);
+            }            
+            OldValues[e.PropertyName] = GetPropertyValue(e.PropertyName); ;
         }
-        Dictionary<string, object> OldValues = new Dictionary<string, object>();
-        public HashSet<IResettable> ResetExeclusions { get; } = new HashSet<IResettable>();
+        Dictionary<string, object> OldValues { get; } = new Dictionary<string, object>();
+
         public HashSet<string> PropertyResetExeclusions { get; } = new HashSet<string>();
+        public HashSet<IResettable> ResetExeclusions { get; } = new HashSet<IResettable>();
 
         private bool IsReset = false;
         public void Reset()
@@ -43,13 +44,6 @@ namespace EZAppz.Core
                 OldValues.Clear();
                 IsReset = true;
             }
-            foreach (var item in InternalDictionary)
-            {
-                if (!PropertyResetExeclusions.Contains(item.Key) && item.Value.Value is IResettable ro && !ResetExeclusions.Contains(ro))
-                {
-                    ro.Reset();
-                }
-            }
             foreach (var item in Items)
             {
                 if (item is IResettable r && !ResetExeclusions.Contains(r))
@@ -57,8 +51,16 @@ namespace EZAppz.Core
                     r.Reset();
                 }
             }
+            foreach (var item in InternalDictionary)
+            {
+                if (!PropertyResetExeclusions.Contains(item.Key) && item.Value.Value is IResettable ro &&  !ResetExeclusions.Contains(ro))
+                {
+                    ro.Reset();
+                }
+            }
             IsReset = false;
         }
+
 
         private bool IsSaveCurrentState = false;
         public void SaveCurrentState()
@@ -72,19 +74,18 @@ namespace EZAppz.Core
                 OldValues.Clear();
                 IsSaveCurrentState = true;
             }
-
-            foreach (var item in InternalDictionary)
-            {
-                if (!PropertyResetExeclusions.Contains(item.Key) && item.Value.Value is IResettable ro && !ResetExeclusions.Contains(ro))
-                {
-                    ro.SaveCurrentState();
-                }
-            }
             foreach (var item in Items)
             {
                 if (item is IResettable r && !ResetExeclusions.Contains(r))
                 {
                     r.SaveCurrentState();
+                }
+            }
+            foreach (var item in InternalDictionary)
+            {
+                if (!PropertyResetExeclusions.Contains(item.Key) && item.Value.Value is IResettable ro && !ResetExeclusions.Contains(ro))
+                {
+                    ro.SaveCurrentState();
                 }
             }
             IsSaveCurrentState = false;

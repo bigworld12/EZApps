@@ -25,10 +25,15 @@ namespace EZAppz.Core
             RaiseItemPropertyChanging((T)sender, e);
         }
 
-        protected override void PrepareIncomingItem(T item)
+        protected override bool PrepareIncomingItem(T item)
         {
+            if (item == null)
+            {
+                return false;
+            }
             item.PropertyChanged += Item_PropertyChanged;
             item.PropertyChanging += Item_PropertyChanging;
+            return true;
         }
         protected override void PrepareLeavingItem(T item)
         {
@@ -46,7 +51,7 @@ namespace EZAppz.Core
 
         public void RaiseItemPropertyChanged(T item, PropertyChangedEventArgs args)
         {
-            ItemPropertyChanged?.Invoke(this, item, args);            
+            ItemPropertyChanged?.Invoke(this, item, args);
         }
         public event ItemPropertyChangedEventHandler<T> ItemPropertyChanged;
     }
