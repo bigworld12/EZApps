@@ -8,5 +8,12 @@ namespace EZAppz.Core.UnitTests.TestModel
 {
     public class Teacher : Person
     {
+        public int Salary
+        {
+            get => RegisterAndGet<int>();
+            set => RegisterAndSet(value);
+        }
+
+
     }
 }

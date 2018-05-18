@@ -59,6 +59,8 @@ namespace EZAppz.Core.UnitTests
 
 
             s.Reset();
+
+
             Assert.AreNotEqual(refD, s.DoB);
             Assert.AreEqual(3, s.ContactInfos.Count);
         }
