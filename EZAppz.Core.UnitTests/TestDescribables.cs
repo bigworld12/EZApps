@@ -47,11 +47,11 @@ namespace EZAppz.Core.UnitTests
             var refD = DateTime.Now;
             s.DoB = refD;
             s.ContactInfos.RemoveAt(1);
-
+            s.ContactInfos.RemoveAt(1);
 
 
             Assert.AreEqual(refD, s.DoB);
-            Assert.AreEqual(2, s.ContactInfos.Count);
+            Assert.AreEqual(1, s.ContactInfos.Count);
             Assert.AreEqual(1, s.GetOldValues().Count);
             //Count/Item[1]/Item[2]
             var oldContacts = s.ContactInfos.GetOldValues();
