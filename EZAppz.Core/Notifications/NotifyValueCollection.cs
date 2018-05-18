@@ -36,11 +36,16 @@ namespace EZAppz.Core
             }
             set
             {
-                if (index < 0 || index >= Count)
+                if (index < 0 || index > Count)
                 {
                     return;
                 }
-                var old = Items[index];
+                if (index == Count)
+                {
+                    Add(value);
+                    return;
+                }
+                var old = this[index];
                 if (EqualityComparer<T>.Default.Equals(old, value))
                 {
                     return;
@@ -55,6 +60,7 @@ namespace EZAppz.Core
                     }
                     PrepareLeavingItem(old);
                 }
+                
                 RaisePropertyChanging($"Item[{index}]");
                 Items[index] = value;
                 RaisePropertyChanged($"Item[{index}]");

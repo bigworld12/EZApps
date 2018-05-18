@@ -15,7 +15,7 @@ namespace EZAppz.Core
         /// Reverts back all the changes that happened since the lastest save/reset
         /// </summary>
         void Reset();
-
+        IReadOnlyDictionary<string, object> GetOldValues();
         HashSet<string> PropertyResetExeclusions { get; }
         HashSet<IResettable> ResetExeclusions { get; }
     }

@@ -213,7 +213,7 @@ namespace EZAppz.Core
                         if (IndexerRes is DescribableObject d)
                         {
                             curObj = d;
-                            finalVal = null;
+                            finalVal = d;
                         }
                         else
                         {

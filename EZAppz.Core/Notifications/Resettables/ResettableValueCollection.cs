@@ -27,6 +27,10 @@ namespace EZAppz.Core
             }
             return base.PrepareIncomingItem(item);
         }
+        public IReadOnlyDictionary<string, object> GetOldValues()
+        {
+            return OldValues;
+        }
         Dictionary<string, object> OldValues = new Dictionary<string, object>();
         public HashSet<IResettable> ResetExeclusions { get; } = new HashSet<IResettable>();
         public HashSet<string> PropertyResetExeclusions { get; } = new HashSet<string>();

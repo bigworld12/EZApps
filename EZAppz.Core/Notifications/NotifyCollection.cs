@@ -26,13 +26,17 @@ namespace EZAppz.Core
         }
 
         protected override bool PrepareIncomingItem(T item)
-        {            
+        {
             item.PropertyChanged += Item_PropertyChanged;
             item.PropertyChanging += Item_PropertyChanging;
             return true;
         }
         protected override void PrepareLeavingItem(T item)
         {
+            if (item == null)
+            {
+                return;
+            }
             item.PropertyChanged -= Item_PropertyChanged;
             item.PropertyChanging -= Item_PropertyChanging;
         }
