@@ -36,5 +36,5 @@ this helped introduce more events like `ItemPropertyChanged` and `ItemPropertyCh
 ### `ResettableObject`
 An object whose properties can be reset to previous values, it inherits `NotifyBase` and exploits the changing/changed notifications to maintain a list of old values for each property
 
-### `ResettableValueCollection` [Not Complete]
+### `ResettableValueCollection`
 the same as `NotifyValueCollection<T>` but with resetting 
