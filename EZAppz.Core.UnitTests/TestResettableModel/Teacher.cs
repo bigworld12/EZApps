@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EZAppz.Core.UnitTests.TestModel
+namespace EZAppz.Core.UnitTests.TestResettableModel
 {
     public class Teacher : Person
     {
@@ -13,7 +13,7 @@ namespace EZAppz.Core.UnitTests.TestModel
             get => RegisterAndGet<int>();
             set => RegisterAndSet(value);
         }
-
+        
 
     }
 }

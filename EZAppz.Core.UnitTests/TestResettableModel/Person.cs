@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EZAppz.Core.UnitTests.TestModel
+namespace EZAppz.Core.UnitTests.TestResettableModel
 {
     public abstract class Person : ResettableObject
     {

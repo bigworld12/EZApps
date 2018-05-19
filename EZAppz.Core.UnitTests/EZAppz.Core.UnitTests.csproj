@@ -51,10 +51,10 @@
     <Compile Include="ParserTests.cs" />
     <Compile Include="TestDescribables.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestModel\ContactInfo.cs" />
-    <Compile Include="TestModel\Person.cs" />
-    <Compile Include="TestModel\Student.cs" />
-    <Compile Include="TestModel\Teacher.cs" />
+    <Compile Include="TestResettableModel\ContactInfo.cs" />
+    <Compile Include="TestResettableModel\Person.cs" />
+    <Compile Include="TestResettableModel\Student.cs" />
+    <Compile Include="TestResettableModel\Teacher.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

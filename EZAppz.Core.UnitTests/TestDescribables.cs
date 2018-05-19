@@ -1,5 +1,5 @@
 ﻿using System;
-using EZAppz.Core.UnitTests.TestModel;
+using EZAppz.Core.UnitTests.TestResettableModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EZAppz.Core.UnitTests
@@ -17,9 +17,9 @@ namespace EZAppz.Core.UnitTests
                 Name = "some name ?",
                 NationalID = "123whocares321"
             };
-            s.ContactInfos.Add(new ContactInfo() { ContactInfoType = ContactInfoTypes.PhoneNumber, Value = "0123456789", Description = "Personal Phone" });
-            s.ContactInfos.Add(new ContactInfo() { ContactInfoType = ContactInfoTypes.PhoneNumber, Value = "0987654321", Description = "Another phone" });
-            s.ContactInfos.Add(new ContactInfo() { ContactInfoType = ContactInfoTypes.Email, Value = "ahmednfwela@gmail.com" });
+            s.ContactInfos.Add(new ContactInfo(s) { ContactInfoType = ContactInfoTypes.PhoneNumber, Value = "0123456789", Description = "Personal Phone" });
+            s.ContactInfos.Add(new ContactInfo(s) { ContactInfoType = ContactInfoTypes.PhoneNumber, Value = "0987654321", Description = "Another phone" });
+            s.ContactInfos.Add(new ContactInfo(s) { ContactInfoType = ContactInfoTypes.Email, Value = "ahmednfwela@gmail.com" });
             return s;
         }
         [TestMethod]
@@ -63,6 +63,12 @@ namespace EZAppz.Core.UnitTests
 
             Assert.AreNotEqual(refD, s.DoB);
             Assert.AreEqual(3, s.ContactInfos.Count);
+        }
+
+        [TestMethod]
+        public void TestResetExeclusions()
+        {
+
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EZAppz.Core.UnitTests.TestModel
+namespace EZAppz.Core.UnitTests.TestResettableModel
 {
     public enum ContactInfoTypes
     {
@@ -15,6 +15,13 @@ namespace EZAppz.Core.UnitTests.TestModel
     }
     public class ContactInfo : ResettableObject
     {
+        public ContactInfo(Person OwnerPerson)
+        {
+            //when the contact info is reset, the owner person shouldn't be reset too
+            PropertyResetExeclusions.Add(nameof(OwnerPerson));
+
+            this.OwnerPerson = OwnerPerson;
+        }
         public string Description
         {
             get => RegisterAndGet<string>();
@@ -29,6 +36,12 @@ namespace EZAppz.Core.UnitTests.TestModel
         {
             get => RegisterAndGet<string>();
             set => RegisterAndSet(value);
+        }
+
+        public Person OwnerPerson
+        {
+            get => RegisterAndGet<Person>();
+            private set => RegisterAndSet(value);
         }
     }
 }
