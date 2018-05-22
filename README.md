@@ -1,8 +1,11 @@
 # EZApps
-a library which introduces some (hopefully useful) dynamic classes
+a library which introduces some (hopefully useful) dynamic classes.  
 The target of this library is to minimize the use of reflection as much as possible
 
 ##### please note that this is not yet complete nor it's good for production code, it's just a fun library to play with
+
+## Nuget:
+https://www.nuget.org/packages/EZAppz.Core/
 
 ## Current classes :
 
@@ -33,8 +36,8 @@ a collection that inherits `NotifyValueCollection<T>` but expands it by restrict
 
 this helped introduce more events like `ItemPropertyChanged` and `ItemPropertyChanging` that detect the changes in the elements contained in the list
 
-### `ResettableObject` [Not Complete]
-An object whose properties can be reset to previous values, it inherits `NotifyBase` and exploits the changing/changed notifications to maintain a list of old values of each property
+### `ResettableObject`
+An object whose properties can be reset to previous values, it inherits `NotifyBase` and exploits the changing/changed notifications to maintain a list of old values for each property
 
-### `ResettableValueCollection` [Not Complete]
+### `ResettableValueCollection`
 the same as `NotifyValueCollection<T>` but with resetting 
