@@ -4,7 +4,7 @@ The target of this library is to minimize the use of reflection as much as possi
 
 ##### please note that this is not yet complete nor it's good for production code, it's just a fun library to play with
 
-##Nuget:
+## Nuget:
 https://www.nuget.org/packages/EZAppz.Core/
 
 ## Current classes :
