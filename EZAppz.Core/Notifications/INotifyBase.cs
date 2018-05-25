@@ -5,7 +5,7 @@ using System.Text;
 
 namespace EZAppz.Core
 {    
-    public interface INotifyBase : INotifyPropertyChanged, INotifyPropertyChanging
+    public interface INotifyBase : INotifyPropertyChanged, INotifyPropertyChanging, INotifyDataErrorInfo
     {
 
     }

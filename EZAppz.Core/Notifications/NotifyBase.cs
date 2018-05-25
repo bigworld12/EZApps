@@ -9,7 +9,7 @@ using System.Text;
 namespace EZAppz.Core
 {
 
-    public abstract class NotifyBase : DescribableObject, INotifyBase, INotifyDataErrorInfo
+    public abstract class NotifyBase : DescribableObject, INotifyBase
     {
 
         internal protected class PropertyRelation
