@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Text;
 namespace EZAppz.Core
 {
 
-    public abstract class NotifyBase : DescribableObject, INotifyBase
+    public abstract class NotifyBase : DescribableObject, INotifyBase, INotifyDataErrorInfo
     {
 
         internal protected class PropertyRelation
@@ -18,6 +19,45 @@ namespace EZAppz.Core
             public HashSet<Action> RelatedChangingActions { get; } = new HashSet<Action>();
         }
         private Dictionary<string, PropertyRelation> PropertyRelations { get; } = new Dictionary<string, PropertyRelation>();
+
+
+        private Dictionary<string, List<string>> Errors = new Dictionary<string, List<string>>();
+        public bool HasErrors => Errors.Any(x => x.Value.Count > 0);
+
+        public IEnumerable GetErrors(string propertyName)
+        {
+            if (Errors.TryGetValue(propertyName, out var l))
+                return l;
+            return null;
+        }
+        public void RaiseErrorChanged(string propertyName)
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+        public void RaiseError(string error, [CallerMemberName] string prop = null)
+        {
+            if (Errors.ContainsKey(prop))
+            {
+                Errors[prop].Add(error);
+            }
+            else
+            {
+                Errors[prop] = new List<string>() { error };
+            }
+            RaiseErrorChanged(prop);
+        }
+        public void ClearErrors([CallerMemberName]string prop = null)
+        {
+            if (Errors.ContainsKey(prop))
+            {
+                Errors[prop].Clear();
+            }
+        }
+        public void ClearAllErrors()
+        {
+            Errors.Clear();
+        }
+
         public NotifyBase(bool ImportFromReflection = false) : base(ImportFromReflection)
         {
             PropertyChanged += NotifyBase_PropertyChanged;
@@ -137,11 +177,13 @@ namespace EZAppz.Core
         {
             PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(prop));
         }
-
+        
 
         [field: NonSerialized]
         public event PropertyChangingEventHandler PropertyChanging;
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
+        [field: NonSerialized]
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
     }
 }
