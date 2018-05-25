@@ -11,7 +11,7 @@ namespace EZAppz.Core
     public abstract class NotifyBase : DescribableObject, INotifyBase
     {
 
-        protected class PropertyRelation
+        internal protected class PropertyRelation
         {
             public HashSet<NotifyDescriptor> RelatedProps { get; } = new HashSet<NotifyDescriptor>();
             public HashSet<Action> RelatedChangedActions { get; } = new HashSet<Action>();

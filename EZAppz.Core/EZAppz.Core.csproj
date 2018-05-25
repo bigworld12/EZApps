@@ -5,11 +5,12 @@
     <Authors>bigworld12</Authors>
     <Description>A package of pre-built classes that facilitates many functionalities, like notifiable objects, resettable objects,...
 all built on describable objects which use dictionaries to store property values (to prevent using reflection too much)</Description>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <PackageProjectUrl>https://github.com/bigworld12/EZApps</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/bigworld12/EZApps/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/bigworld12/EZApps</RepositoryUrl>
     <PackageTags>c# .net wpf ez ezapps appz ezappz reset notifications</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
