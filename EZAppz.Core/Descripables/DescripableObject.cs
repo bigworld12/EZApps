@@ -23,6 +23,8 @@ namespace EZAppz.Core
                     ["Item"] = new DescribableProperty("Item", true, new IndexerDescriptorContainer())
                 };
         }
+
+        [Obsolete("This method is not tested YET")]
         public void ImportDescriptionFromReflection(bool RemovePrevious, bool ImportIndexersOnly)
         {
             if (RemovePrevious)
@@ -156,6 +158,59 @@ namespace EZAppz.Core
             }
         }
 
+
+        /// <summary>
+        /// Only call this when you are sure the property is registered.
+        /// </summary>
+        /// <typeparam name="TVal"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="prop"></param>
+        public void DirectSet<TVal>(TVal value, [CallerMemberName] string prop = null, bool RaiseExceptions = false)
+        {
+            if (prop == "Item")
+            {
+                throw new ArgumentException("Item property name is reserved for indexer properties, please choose another name");
+            }
+            if (InternalDictionary.TryGetValue(prop, out var p))
+            {
+                Before_Set(prop, value);
+                p.Value = value;
+                After_Set(prop, value);
+            }
+            else if (RaiseExceptions)
+            {
+                throw new ArgumentException($"The Property {prop} isn't Registered");
+            }
+        }
+
+        /// <summary>
+        /// Only call this when you are sure the property is registered.
+        /// </summary>
+        /// <typeparam name="TVal"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="prop"></param>
+        public TVal DirectGet<TVal>([CallerMemberName] string prop = null, bool RaiseExceptions = false)
+        {
+            if (prop == "Item")
+            {
+                throw new ArgumentException("Item property name is reserved for indexer properties, please choose another name");
+            }
+            if (InternalDictionary.TryGetValue(prop, out var p))
+            {
+                return (TVal)p.Value;
+            }
+            else
+            {
+                if (RaiseExceptions)
+                {
+                    throw new ArgumentException($"The Property {prop} isn't Registered");
+                }
+                else
+                {
+                    return default(TVal);
+                }
+            }
+        }
 
         public virtual object GetPropertyValue([CallerMemberName] string prop = null)
         {

@@ -30,10 +30,16 @@ namespace EZAppz.Core.UnitTests
             CollectionAssert.AreEqual(MakeCollection("Item[0]", "Item[3]", "Item[4,5]"), Helpers.ParsePropertyParts(p));
         }
         [TestMethod]
-        public void CompositeTest()
+        public void CompositeTest1()
         {
             var p = "Item[0][2].A.B[3]";
             CollectionAssert.AreEqual(MakeCollection("Item[0]", "Item[2]", "A", "B", "Item[3]"), Helpers.ParsePropertyParts(p));
+        }
+        [TestMethod]
+        public void CompositeTest2()
+        {
+            var p = "h.a[5].b[3][9][89].e";
+            CollectionAssert.AreEqual(MakeCollection("h", "a", "Item[5]", "b", "Item[3]", "Item[9]", "Item[89]", "e"), Helpers.ParsePropertyParts(p));
         }
     }
 }

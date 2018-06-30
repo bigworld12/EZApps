@@ -19,8 +19,8 @@ namespace EZAppz.Core
                 clean = clean.Remove(0, 4);
             }
             prop = clean.Replace(".Item[", "[").Replace("[", ".Item[").TrimStart('.');
-            Stack<char> Brackets = new Stack<char>();
-            StringBuilder sb = new StringBuilder();
+            var Brackets = new Stack<char>();
+            var sb = new StringBuilder();
             for (int i = 0; i < prop.Length; i++)
             {
                 var c = prop[i];
