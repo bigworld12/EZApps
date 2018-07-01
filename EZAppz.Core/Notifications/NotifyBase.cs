@@ -88,8 +88,15 @@ namespace EZAppz.Core
                 }
             }
         }
+        public void UnRegisterRelationProperty(string origin, NotifyBase target_owner, params string[] target_prop)
+        {
+            if (PropertyRelations.TryGetValue(origin, out var rel))
+            {
+                rel.RelatedProps.RemoveWhere(x => x.Owner == target_owner && target_prop.Contains(x.PropertyName));
+            }
+        }
 
-        public void RegisterChangingAction(string origin, NotifyBase target_owner, params Action[] target_action)
+        public void RegisterChangingAction(string origin, params Action[] target_action)
         {
             if (!PropertyRelations.TryGetValue(origin, out var rel))
             {
@@ -103,7 +110,15 @@ namespace EZAppz.Core
                 }
             }
         }
-        public void RegisterChangedAction(string origin, NotifyBase target_owner, params Action[] target_action)
+        public void UnRegisterChangingAction(string origin, params Action[] target_action)
+        {
+            if (PropertyRelations.TryGetValue(origin, out var rel))
+            {
+                rel.RelatedChangingActions.RemoveWhere(x => target_action.Contains(x));
+            }
+        }
+
+        public void RegisterChangedAction(string origin, params Action[] target_action)
         {
             if (!PropertyRelations.TryGetValue(origin, out var rel))
             {
@@ -117,7 +132,16 @@ namespace EZAppz.Core
                 }
             }
         }
-        public void RegisterChangingAndChangedAction(string origin, NotifyBase target_owner, params Action[] target_action)
+        public void UnRegisterChangedAction(string origin, params Action[] target_action)
+        {
+            if (PropertyRelations.TryGetValue(origin, out var rel))
+            {
+                rel.RelatedChangedActions.RemoveWhere(x => target_action.Contains(x));
+            }
+        }
+
+
+        public void RegisterChangingAndChangedAction(string origin, params Action[] target_action)
         {
             if (!PropertyRelations.TryGetValue(origin, out var rel))
             {
@@ -135,6 +159,15 @@ namespace EZAppz.Core
                 }
             }
         }
+        public void UnRegisterChangingAndChangedAction(string origin, params Action[] target_action)
+        {
+            if (PropertyRelations.TryGetValue(origin, out var rel))
+            {
+                rel.RelatedChangingActions.RemoveWhere(x => target_action.Contains(x));
+                rel.RelatedChangedActions.RemoveWhere(x => target_action.Contains(x));
+            }
+        }
+
 
         private void NotifyBase_PropertyChanging(object sender, PropertyChangingEventArgs e)
         {
@@ -152,6 +185,8 @@ namespace EZAppz.Core
                 }
             }
         }
+
+
         private void NotifyBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (PropertyRelations.TryGetValue(e.PropertyName, out var rel))
@@ -177,7 +212,7 @@ namespace EZAppz.Core
         {
             PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(prop));
         }
-        
+
 
         [field: NonSerialized]
         public event PropertyChangingEventHandler PropertyChanging;
