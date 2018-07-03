@@ -212,7 +212,12 @@ namespace EZAppz.Core
         {
             PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(prop));
         }
-
+        public void SetAndNotify<TVal>(ref TVal backingfield, TVal value, [CallerMemberName] string prop = null)
+        {
+            RaisePropertyChanging(prop);
+            backingfield = value;
+            RaisePropertyChanged(prop);
+        }
 
         [field: NonSerialized]
         public event PropertyChangingEventHandler PropertyChanging;
